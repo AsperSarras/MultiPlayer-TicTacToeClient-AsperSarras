@@ -47,18 +47,6 @@ public class LogInDataScript : MonoBehaviour
             NetworkedClient.Instance.UserName = _string1;
         }
         NetworkedClient.Instance.SendMessageToHost(data);
-
-        //switch (action)
-        //{
-        //    case 0://creation
-        //        data = _string1 + "," + _string2;
-        //        break;
-        //    case 1://login
-        //        data = _string1 + "," + _string2;
-        //        NetworkedClient.Instance.UserName = _string1;
-        //        break;
-        //}
-        //NetworkedClient.Instance._sendData(data, action);
     }
 
     public void CloseMessage()

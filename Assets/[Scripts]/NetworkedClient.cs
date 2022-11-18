@@ -34,10 +34,25 @@ public class NetworkedClient : MonoBehaviour
     public bool newMove = false;
     public int winCheck = -1;
 
+    public int ChatCheck = -1;
+
     public int serverMessage = -1;
 
     public bool ErrorCheck = false;
     public string ErrorMessage = "";
+
+    public bool ExpectatorUpdate = false;
+    public string ExpectatorData = "";
+
+    public string GameReplayName = "";
+    public string GameReplayData = "";
+
+    public bool GamePlayNotificationCheck = false;
+    public string GamePlayNotificationMessage = "";
+
+    public bool ReplayUpdate = false;
+    public string replayData = "";
+    public bool ReplayPlaying = false;
 
     private void Awake()//singleton
     {
@@ -139,47 +154,6 @@ public class NetworkedClient : MonoBehaviour
         return isConnected;
     }
 
-    //public void _sendData(string d, int ClientInstruction) // Can make all without this!
-    //{
-    //    string[] data = d.Split(",");
-
-    //    if (IsConnected())
-    //    {
-    //        string msg="";
-    //        string ServerInstruction = ClientInstruction.ToString();
-    //        switch (ClientInstruction)
-    //        {
-    //            case 0:
-    //                msg = ServerInstruction + "," + data[0] + "," + data[1]; //create 0 = Username 1 = Password //done 
-    //                break;
-    //            case 1:
-    //                msg = ServerInstruction + "," + data[0] + "," + data[1]; //login 0 = Username 1 = Password //done
-    //                break;
-    //            case 2:
-    //                msg = ServerInstruction + "," + data[0]; //check room 0 = Room Name //done
-    //                break;
-    //            case 3:
-    //                msg = ServerInstruction; //LogOut //done
-    //                break;
-    //            case 4:
-    //                msg = ServerInstruction; //Cancel Room Check  //done
-    //                break;
-    //            case 5:
-    //                msg = ServerInstruction + "," + data[0]; //Send Player Move 0 = Square Selected
-    //                break;
-    //        }
-
-            
-    //        Debug.Log(msg);
-    //        SendMessageToHost(msg);
-    //    }
-    //    else
-    //    {
-    //        Debug.Log("NoConnected");
-    //    }
-
-    //}
-
     public void SendMessageToHost(string msg)
     {
         byte[] buffer = Encoding.Unicode.GetBytes(msg);
@@ -190,13 +164,12 @@ public class NetworkedClient : MonoBehaviour
     {
         string[] data = msg.Split(",");
         int i = int.Parse(data[0]);
-
+        Debug.Log(i);
         switch (i)
         {
             case 0:
                 ErrorCheck = true;
                 ErrorMessage = "User already created";
-                Debug.Log(ErrorMessage);
                 break;
             case 1:
                 Debug.Log("Created");
@@ -209,12 +182,10 @@ public class NetworkedClient : MonoBehaviour
             case 3:
                 ErrorCheck = true;
                 ErrorMessage = "Password Incorrect";
-                Debug.Log(ErrorMessage);
                 break;
             case 4:
                 ErrorCheck = true;
                 ErrorMessage = "User not Created";
-                Debug.Log(ErrorMessage);
                 break;
             case 5:
                 Debug.Log("JoinedGame");
@@ -289,6 +260,71 @@ public class NetworkedClient : MonoBehaviour
                 Debug.Log("Enemy Left Game");
                 serverMessage = 2;
                 break;
+            case 16:
+                ErrorCheck = true;
+                ErrorMessage = "Room Players Full";
+                break;
+            case 17:
+                ChatCheck = int.Parse(data[1]);
+                break;
+            case 18:
+                //UpdateExpectator
+                ExpectatorData = msg;
+                ExpectatorUpdate = true;
+                break;
+            case 19:
+                ErrorCheck = true;
+                ErrorMessage = "Room Not Found";
+                break;
+            case 20:
+                ErrorCheck = true;
+                ErrorMessage = "Game Has Not Started";
+                break;
+            case 21: //ExpectateGame
+                PlayerState = StateEnum.GAME;
+                //ExpectatorCheck = true;
+                PlayerSign = "O";
+                EnemySign = "X";
+                break;
+            case 22: //ReplaySaved
+                GamePlayNotificationMessage = "Replay Saved";
+                GamePlayNotificationCheck = true;
+                break;
+            case 23: //ReplaySavedFailed
+                GamePlayNotificationMessage = "Replay with that name already exists";
+                GamePlayNotificationCheck = true;
+                break;
+            case 24:
+                replayData = "";
+                for (int ReplayI = 1; ReplayI < data.Length; ReplayI++)
+                {
+                    if (ReplayI == 1)
+                    {
+                        replayData = data[ReplayI];
+                    }
+                    else
+                    {
+                        replayData = replayData + "," + data[ReplayI];
+                    }
+                }
+                ReplayUpdate = true;
+                break;
+            case 25:
+                for (int ReplayGame = 1; ReplayGame < data.Length; ReplayGame++)
+                {
+                    if (ReplayGame == 1)
+                    {
+                        GameReplayData = data[ReplayGame];
+                    }
+                    else
+                    {
+                        GameReplayData = GameReplayData + "," + data[ReplayGame];
+                    }
+                }
+                ReplayPlaying = true;
+                PlayerState = StateEnum.GAME;
+                break;
         }
     }
+
 }

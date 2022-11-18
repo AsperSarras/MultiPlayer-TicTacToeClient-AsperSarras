@@ -55,6 +55,17 @@ public class MyButtonScript : MonoBehaviour
         _logInDataScript._updateUserData(type);
     }
 
+    public void _ReplayMenu()
+    {
+        _newMenu.SetActive(true);
+        NetworkedClient.Instance.SendMessageToHost("11");
+    }
+
+    public void _GoBackFromReplay()
+    {
+        _newMenu.SetActive(false);
+    }
+
     public void _LogOut()
     {
         //NetworkedClient.Instance._sendData("", 3);
